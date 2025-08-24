@@ -73,7 +73,7 @@ class Task_Tracker():
         
         
     
-    def update_task(self, user_command: str):
+    def update_task_name(self, user_command: str):
         try:
             chunks = user_command.split()
             task_id = int(chunks[1])
@@ -87,6 +87,18 @@ class Task_Tracker():
         except ValueError:
             print("Please enter valid values. Example update <id-of-task> <new_name>")
 
+    def update_task_description(self, user_command: str):
+        try:
+            chunks = user_command.split()
+            task_id = int(chunks[1])
+            new_description = input("modify desc: ")
+            for task in self.tasks:
+                if task_id == task.task_id:
+                    task.description = new_description
+        except ValueError:
+            print("Please enter a numeric value for task_id, Example: update-description <task_id>")
+        except IndexError:
+            print("Please enter the value of task_id, Example: update-description <task_id>")
 
     def delete_task(self, user_command: str):
         try:
@@ -96,7 +108,8 @@ class Task_Tracker():
                 if task_id == task.task_id:
                     self.tasks.remove(task)
         except ValueError:
-            print("Please enter a valid int value. Example delete <task-id>")
+            print("Please enter a valid int value, Example: delete <task-id>")
+       
 
         
 
@@ -166,7 +179,17 @@ class Task_Tracker():
         else:
             self.list_all_tasks()
 
-
+    def display_task_description(self, user_command: str):
+        try:
+            chunks = user_command.split()
+            task_id = int(chunks[1])
+            for task in self.tasks:
+                if task_id == task.task_id:
+                    print(f"Desc: {task.description}")
+        except IndexError:
+            print("please enter the value of task_id, Example: show-description <task-id>")
+        except ValueError:
+            print("Please enter a numeric task-id, example: show-description <task-id>")
     def file_content():
         with open("tasks.json", "w") as f:
             content = json.loads(f)
@@ -184,14 +207,16 @@ def main():
      
         usr_input = input("> ")
         chunks = usr_input.split()
-        if usr_input.startswith(("add", "update", "delete", "mark-", "list")):
+        if usr_input.startswith(("add", "update", "delete", "mark-", "list", "show-" )):
             command = chunks[0].lower()
             if command == "add":
                 description = input("add description ")
                 task_tracker.add_task(usr_input, description)
-                
+
+            elif command.startswith("update-desc"):
+                task_tracker.update_task_description(usr_input)
             elif command == "update":
-                task_tracker.update_task(usr_input)
+                task_tracker.update_task_name(usr_input)
                 
             elif command == "delete":
                 task_tracker.delete_task(usr_input)
@@ -201,8 +226,11 @@ def main():
             
             elif command == "list":
                 task_tracker.listing_tasks(usr_input)
-            else:
-                print("please enter a valid command")
+
+            elif usr_input.startswith("show-"):
+                task_tracker.display_task_description(usr_input)
+        else:
+            print("please enter a valid command")
         with open("tasks.json", "w") as f:
             tasks_details = []
             for task in task_tracker.tasks:
